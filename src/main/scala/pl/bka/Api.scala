@@ -42,17 +42,21 @@ object Api {
     true
   }
 
-  def run(dir: File, take: Int = 10) = {
-    listHashes(dir).take(take).foreach(hash => {
+  //TODO String -> case class Hash/Word
+  //TODO take path: String instead of dir: File
+  def read(dir: File, take: Int = 10): Map[String, Map[String, Int]] =
+    listHashes(dir).take(take).map(hash => {
       checkout(dir, hash)
-      val wcs = wcFiles(listFiles(dir))
+      (hash, wcFiles(listFiles(dir)))
+    }).toMap
 
+  def write(data: Map[String, Map[String, Int]], outputPath: String) =
+    data.toSeq.foreach { case (hash, wcs) =>
       val sorted = ListMap(wcs.toSeq.sortWith(_._2 > _._2):_*)
-      using(new FileWriter(s"/home/dp/projects/tmp/$hash")) { pw =>
+      using(new FileWriter(s"$outputPath/$hash")) { pw =>
         pw.write(sorted.mkString("\n"))
       }
-    })
-  }
+    }
 
   def using[A <: {def close() : Unit}, B](param: A)(f: A => B): B =
     try {
