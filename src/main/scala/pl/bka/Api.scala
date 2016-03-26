@@ -26,8 +26,8 @@ object Api {
           .flatMap(_.split("\\W+"))
           .filterNot(_ == "")
           .toSeq
-          .groupBy(identity)
-          .map { case (word, seq) => Word(word) -> seq.size }
+          .groupBy(Word)
+          .mapValues(_.size)
       }
     }
 
