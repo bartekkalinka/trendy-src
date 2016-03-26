@@ -6,46 +6,51 @@ import scala.io.{Codec, Source}
 import sys.process._
 import scala.collection.immutable.ListMap
 
+case class Hash(value: String)
+case class Commit(hash: Hash)
+case class Word(value: String)
+
 object Api {
   implicit val codec = Codec.UTF8
 
-  def read(dir: File, take: Int = 10): Map[String, Map[String, Int]] = {
-    def listFiles(dir: File): Array[File] = {
+  def read(dir: File, take: Int = 10): Map[Commit, Map[Word, Int]] = {
+    def listFiles(dir: File): Seq[File] = {
       val files = dir.listFiles
       val scalas = files.filter(_.getName.endsWith(".scala"))
-      scalas ++ files.filter(_.isDirectory).flatMap(listFiles(_))
+      scalas ++ files.filter(_.isDirectory).flatMap(listFiles)
     }
 
-    def wc(file: File): Map[String, Int] = {
+    def wc(file: File): Map[Word, Int] = {
       using(Source.fromFile(file)) { source =>
-        source.getLines
+        source.getLines()
           .flatMap(_.split("\\W+"))
           .filterNot(_ == "")
-          .foldLeft(Map.empty[String, Int]) {
+          .map(Word)
+          .foldLeft(Map.empty[Word, Int]) {
           (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
         }
       }
     }
 
-    def wcFiles(files: Array[File]): Map[String, Int] = {
-      files.map(wc(_)).foldLeft(Map.empty[String, Int]) {
+    def wcFiles(files: Seq[File]): Map[Word, Int] = {
+      files.map(wc).foldLeft(Map.empty[Word, Int]) {
         (left, right) => (left.keySet ++ right.keySet).map(i => (i, left.getOrElse(i, 0) + right.getOrElse(i, 0))).toMap
       }
     }
 
-    def listHashes(dir: File): Array[String] = {
+    def listCommits(dir: File): Seq[Commit] = {
       val lines = Seq("git", "-C", dir.getAbsolutePath, "log", "--pretty=format:\"%h\"").!!
-      lines.split("\n").map(_.replace("\"", "")).reverse
+      lines.split("\n").map(str => Commit(Hash(str.replace("\"", "")))).reverse
     }
 
-    def checkout(dir: File, hash: String) = {
-      val lines = Seq("git", "-C", dir.getAbsolutePath, "checkout", hash).!!
+    def checkout(dir: File, hash: Hash) = {
+      val lines = Seq("git", "-C", dir.getAbsolutePath, "checkout", hash.value).!!
       true
     }
 
-    listHashes(dir).take(take).map(hash => {
-      checkout(dir, hash)
-      (hash, wcFiles(listFiles(dir)))
+    listCommits(dir).take(take).map(commit => {
+      checkout(dir, commit.hash)
+      (commit, wcFiles(listFiles(dir)))
     }).toMap
   }
 
