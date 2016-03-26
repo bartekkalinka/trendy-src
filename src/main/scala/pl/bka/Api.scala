@@ -25,10 +25,9 @@ object Api {
         source.getLines()
           .flatMap(_.split("\\W+"))
           .filterNot(_ == "")
-          .map(Word)
-          .foldLeft(Map.empty[Word, Int]) {
-          (count, word) => count + (word -> (count.getOrElse(word, 0) + 1))
-        }
+          .toSeq
+          .groupBy(identity)
+          .map { case (word, seq) => Word(word) -> seq.size }
       }
     }
 
