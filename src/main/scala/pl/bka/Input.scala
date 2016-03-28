@@ -8,7 +8,7 @@ case class LineOfText(value: String)
 
 trait Input {
   def listCommits: Seq[Commit]
-  def checkout(hash: Hash): Seq[Seq[LineOfText]]
+  def checkout(hash: Hash): Seq[LineOfText]
 }
 
 case class RealInput(dir: File) extends Input with Using {
@@ -17,7 +17,7 @@ case class RealInput(dir: File) extends Input with Using {
     lines.split("\n").map(str => Commit(Hash(str.replace("\"", "")))).reverse
   }
 
-  def checkout(hash: Hash): Seq[Seq[LineOfText]] = {
+  def checkout(hash: Hash): Seq[LineOfText] = {
     def gitCheckout(hash: Hash): Unit =
       Seq("git", "-C", dir.getAbsolutePath, "checkout", hash.value).!!
     def listFiles(dir: File): Seq[File] = {
@@ -28,7 +28,7 @@ case class RealInput(dir: File) extends Input with Using {
     def fileLines(file: File): Seq[LineOfText] =
       using(Source.fromFile(file)) { source => source.getLines().map(LineOfText).toList }
     gitCheckout(hash)
-    listFiles(dir).map(fileLines)
+    listFiles(dir).flatMap(fileLines)
   }
 }
 
