@@ -8,10 +8,14 @@ case class Counter(input: Input) extends Using {
         .filterNot(_ == "")
         .groupBy(Word)
         .mapValues(_.size)
-
-    input.listCommits.take(take).map(commit =>
-      (commit, wc(input.checkout(commit.hash)))
-    ).toMap
+    try {
+      input.listCommits.take(take).map(commit =>
+        (commit, wc(input.checkout(commit.hash)))
+      ).toMap
+    }
+    finally {
+      input.cleanup
+    }
   }
 }
 

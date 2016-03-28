@@ -9,6 +9,7 @@ case class LineOfText(value: String)
 trait Input {
   def listCommits: Seq[Commit]
   def checkout(hash: Hash): Seq[LineOfText]
+  def cleanup: Unit
 }
 
 case class RealInput(dir: File) extends Input with Using {
@@ -30,5 +31,8 @@ case class RealInput(dir: File) extends Input with Using {
     gitCheckout(hash)
     listFiles(dir).flatMap(fileLines)
   }
+
+  def cleanup: Unit =
+    Seq("git", "-C", dir.getAbsolutePath, "checkout", "master").!!
 }
 
