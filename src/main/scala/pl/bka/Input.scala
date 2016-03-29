@@ -12,7 +12,9 @@ trait Input {
   def cleanup: Unit
 }
 
-case class RealInput(dir: File, fileExt: String) extends Input with CloseSupport {
+case class RealInput(dirPath: String, fileExt: String) extends Input with CloseSupport {
+  val dir = new File(dirPath)
+
   def listCommits: Seq[Commit] = {
     val lines = Seq("git", "-C", dir.getAbsolutePath, "log", "--pretty=format:\"%h\"").!!
     lines.split("\n").map(str => Commit(Hash(str.replace("\"", "")))).reverse
