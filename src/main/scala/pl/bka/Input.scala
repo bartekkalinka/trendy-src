@@ -12,7 +12,7 @@ trait Input {
   def cleanup: Unit
 }
 
-case class RealInput(dir: File) extends Input with Using {
+case class RealInput(dir: File, fileExt: String) extends Input with Using {
   def listCommits: Seq[Commit] = {
     val lines = Seq("git", "-C", dir.getAbsolutePath, "log", "--pretty=format:\"%h\"").!!
     lines.split("\n").map(str => Commit(Hash(str.replace("\"", "")))).reverse
@@ -23,7 +23,7 @@ case class RealInput(dir: File) extends Input with Using {
       Seq("git", "-C", dir.getAbsolutePath, "checkout", hash.value).!!
     def listFiles(dir: File): Seq[File] = {
       val files = dir.listFiles
-      val scalas = files.filter(_.getName.endsWith(".scala"))
+      val scalas = files.filter(_.getName.endsWith(fileExt))
       scalas ++ files.filter(_.isDirectory).flatMap(listFiles)
     }
     def fileLines(file: File): Seq[LineOfText] =
