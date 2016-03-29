@@ -1,6 +1,6 @@
 package pl.bka
 
-case class Counter(input: Input) extends Using {
+case class Counter(input: Input) extends CloseSupport {
   def read(take: Int = 10): Map[Commit, Map[Word, Int]] = {
     def wc(lines: Seq[LineOfText]): Map[Word, Int] =
       lines
