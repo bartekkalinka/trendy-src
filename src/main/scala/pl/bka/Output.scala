@@ -1,19 +1,16 @@
 package pl.bka
 
-import java.io.FileWriter
-import scala.collection.immutable.ListMap
-import scala.io.Codec
+import slick.jdbc.JdbcBackend.Database
+import slick.driver.PostgresDriver.api._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-object Output extends CloseSupport {
-  implicit val codec = Codec.UTF8
-
-  def write(data: Map[String, Map[String, Int]], outputPath: String) = {
-    data.toSeq.foreach { case (hash, wcs) =>
-      val sorted = ListMap(wcs.toSeq.sortWith(_._2 > _._2): _*)
-      closeAfterRun(new FileWriter(s"$outputPath/$hash")) { pw =>
-        pw.write(sorted.mkString("\n"))
-      }
-    }
+object Output {
+  def write(data: Seq[WordCount]): Future[Unit] = {
+    val db = Database.forConfig("db")
+    db.run(DBIO.sequence(data.map { wc =>
+      sqlu"""INSERT INTO wordcounts(hash, word, count) VALUES (${wc.commit.hash.value}, ${wc.word.value}, ${wc.count})"""
+    })).map(x => ())
   }
 }
 

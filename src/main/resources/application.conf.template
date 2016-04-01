@@ -1,0 +1,9 @@
+db {
+  driver = org.postgresql.Driver
+  url = "jdbc:postgresql://[IP_ADDRESS]/[DATABASE_NAME]"
+  properties = {
+    user = "[USER]"
+    password = "[PASSWORD]"
+  }
+  numThreads = 10
+}

@@ -1,0 +1,1 @@
+﻿CREATE TABLE wordcounts(hash text NOT NULL, word text NOT NULL, count bigint NOT NULL);
