@@ -8,9 +8,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object Output {
   def write(data: Seq[WordCount]): Future[Unit] = {
     val db = Database.forConfig("db")
-    db.run(DBIO.sequence(data.map { wc =>
-      sqlu"""INSERT INTO wordcounts(hash, word, count) VALUES (${wc.commit.hash.value}, ${wc.word.value}, ${wc.count})"""
-    })).map(x => ())
+    db.run(for {
+      _ <- sqlu"""DELETE FROM wordcounts"""
+      _ <- DBIO.sequence(data.map { wc =>
+          sqlu"""INSERT INTO wordcounts(hash, word, count) VALUES (${wc.commit.hash.value}, ${wc.word.value}, ${wc.count})"""
+        })
+      } yield ()
+    )
   }
 }
 
