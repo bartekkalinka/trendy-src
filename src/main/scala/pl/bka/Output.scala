@@ -6,22 +6,22 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.lifted.TableQuery
 
-case class DbWordCount(hash: String, word: String, count: Int)
-
-class WordCountsTable(tag: Tag) extends Table[DbWordCount](tag, "wordcounts") {
-  def hash = column[String]("hash")
-  def word = column[String]("word")
+class WordCountsTable(tag: Tag) extends Table[WordCount](tag, "wordcounts") {
+  def hashColumn = column[String]("hash")
+  def wordColumn = column[String]("word")
   def count = column[Int]("count")
-  def * = (hash, word, count) <> ((DbWordCount.apply _).tupled, DbWordCount.unapply)
+  def commit = hashColumn <> ( { value: String => Commit(Hash(value)) }, { commit: Commit => Some(commit.hash.value) })
+  def word = wordColumn <> (Word.apply, Word.unapply)
+
+  def * = (commit, word, count) <> ((WordCount.apply _).tupled, WordCount.unapply)
 }
 
 object Output {
   def write(data: Seq[WordCount]): Future[Unit] = {
     val db = Database.forConfig("db")
     val wcTable = TableQuery[WordCountsTable]
-    val recordsToInsert = data.map(wc => DbWordCount(wc.commit.hash.value, wc.word.value, wc.count))
     val deleteAction = sqlu"""DELETE FROM wordcounts"""
-    val insertAction = wcTable ++= recordsToInsert
+    val insertAction = wcTable ++= data
     db.run(
       for {
         _ <- deleteAction
