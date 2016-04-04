@@ -10,3 +10,5 @@ WITH agr AS (select word, max(count) maxcnt, min(count) mincnt from wordcounts g
 select word, maxcnt, mincnt from agr where maxcnt - mincnt = (select max(maxcnt - mincnt) from agr);
 
 select count(distinct hash) from wordcounts;
+
+select count(distinct word), sum(count), hash from wordcounts group by hash;

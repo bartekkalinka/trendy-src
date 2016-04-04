@@ -19,10 +19,13 @@ object Output {
   def write(data: Seq[WordCount]): Future[Unit] = {
     val db = Database.forConfig("db")
     val wcTable = TableQuery[WordCountsTable]
+    val recordsToInsert = data.map(wc => DbWordCount(wc.commit.hash.value, wc.word.value, wc.count))
+    val deleteAction = sqlu"""DELETE FROM wordcounts"""
+    val insertAction = wcTable ++= recordsToInsert
     db.run(
       for {
-        _ <- sqlu"""DELETE FROM wordcounts"""
-        _ <- wcTable ++= (data.map(wc => DbWordCount(wc.commit.hash.value, wc.word.value, wc.count)))
+        _ <- deleteAction
+        _ <- insertAction
       } yield ()
     )
   }
