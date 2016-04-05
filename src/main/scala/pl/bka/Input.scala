@@ -17,7 +17,7 @@ case class RealInput(dirPath: String, fileExt: String) extends Input with CloseS
 
   def listCommits: Seq[Commit] = {
     val lines = Seq("git", "-C", dir.getAbsolutePath, "log", "--pretty=format:\"%h\"").!!
-    lines.split("\n").map(str => Commit(Hash(str.replace("\"", "")))).reverse
+    lines.split("\n").zipWithIndex.map { case (str, index) => Commit(index, Hash(str.replace("\"", ""))) }.reverse
   }
 
   def checkout(hash: Hash): Seq[LineOfText] = {
