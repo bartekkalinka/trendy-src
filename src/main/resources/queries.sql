@@ -14,3 +14,5 @@ select count(distinct hash) from wordcounts;
 select count(distinct word), sum(count), hash from wordcounts group by hash;
 
 select min(seqnum), max(seqnum) from wordcounts;
+
+select distinct seqnum, hash from wordcounts order by seqnum, hash;
