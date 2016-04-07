@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 case class Hash(value: String)
-case class Commit(seqNum: Int, hash: Hash)
+case class Commit(seqNum: Int, hash: Hash, date: String)
 case class Word(value: String)
 case class WordCount(commit: Commit, word: Word, count: Int)
 
