@@ -16,3 +16,5 @@ select count(distinct word), sum(count), hash from wordcounts group by hash;
 select min(seqnum), max(seqnum) from wordcounts;
 
 select distinct seqnum, hash, commit_date from wordcounts order by seqnum, hash, commit_date;
+
+select seqnum, hash, commit_date, sum(count) from wordcounts group by seqnum, hash, commit_date order by seqnum;
