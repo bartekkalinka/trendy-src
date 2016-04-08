@@ -1,6 +1,11 @@
 package pl.bka
 
 import java.io.File
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+
 import scala.io.Source
 import sys.process._
 
@@ -19,8 +24,9 @@ case class RealInput(dirPath: String, fileExt: String) extends Input with CloseS
     def parseCommit(gitLogString: String, index: Int): Commit = {
       val gitLogSplit = gitLogString.split(" ")
       val hash = Hash(gitLogSplit.head.replace("\"", ""))
-      val date = gitLogSplit.tail.reduce(_ + " " + _).replace("\"", "")
-      Commit(index, hash, date)
+      val date = gitLogSplit.tail.take(2).reduce(_ + " " + _).replace("\"", "")
+      val formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")
+      Commit(index, hash, formatter.parseDateTime(date))
     }
     val lines = Seq("git", "-C", dir.getAbsolutePath, "log", "--date=iso", "--pretty=format:\"%h %cd\"").!!
     lines.split("\n").reverse.zipWithIndex.map((parseCommit _).tupled).reverse

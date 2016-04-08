@@ -10,6 +10,9 @@ libraryDependencies ++= {
     "com.typesafe.slick" %% "slick" % "3.1.1",
     "com.github.tminglei" %% "slick-pg" % "0.12.0",
     "com.typesafe.slick" %% "slick-hikaricp" % "3.1.1",
-    "com.typesafe" % "config" % "1.3.0"
+    "com.typesafe" % "config" % "1.3.0",
+    "joda-time" % "joda-time" % "2.9",
+    "org.joda" % "joda-convert" % "1.8.1",
+    "com.github.tototoshi" %% "slick-joda-mapper" % "2.0.0"
   )
 }
