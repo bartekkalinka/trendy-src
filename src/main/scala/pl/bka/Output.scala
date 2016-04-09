@@ -1,7 +1,5 @@
 package pl.bka
 
-import java.time.LocalDateTime
-
 import org.joda.time.DateTime
 import slick.jdbc.JdbcBackend.Database
 import slick.driver.PostgresDriver.api._
