@@ -20,6 +20,12 @@ case class Counter(input: Input) {
     }
   }
 
-  def read(take: Int): Seq[WordCount] = stream.take(take).toList.flatten
+  def stream(chunkSize: Int): Stream[Chunk] = {
+    def chunkStream(stream: Stream[Seq[WordCount]]): Stream[Chunk] =
+      Chunk(stream.take(chunkSize).toList.flatten) #:: chunkStream(stream.drop(chunkSize))
+    chunkStream(stream)
+  }
+
+  def read(take: Int): List[WordCount] = stream.take(take).toList.flatten
 }
 
