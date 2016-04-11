@@ -10,12 +10,13 @@ case class Commit(seqNum: Int, hash: Hash, date: DateTime)
 case class Word(value: String)
 case class WordCount(commit: Commit, word: Word, count: Int)
 case class Chunk(data: List[WordCount])
+case class ChunksStream(stream: Stream[Chunk], cleanup: Unit => Unit)
 
 object Api {
   def read(path: String, take: Int = 10): List[WordCount] =
     Counter(RealInput(path, ".scala")).read(take)
 
-  def stream(path: String, chunkSize: Int): Stream[Chunk] =
+  def stream(path: String, chunkSize: Int): ChunksStream =
     Counter(RealInput(path, ".scala")).stream(chunkSize)
 
   def write(data: List[WordCount]) =
