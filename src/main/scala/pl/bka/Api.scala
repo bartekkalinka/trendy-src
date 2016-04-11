@@ -21,4 +21,7 @@ object Api {
 
   def write(data: List[WordCount]) =
     Await.result(Output.write(data), 1000 seconds)
+
+  def write(chunks: ChunksStream) =
+    Output.write(chunks)
 }
