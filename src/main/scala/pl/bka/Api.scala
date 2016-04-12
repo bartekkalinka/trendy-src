@@ -16,4 +16,6 @@ object Api {
 
   def write(data: Seq[WordCount]) =
     Await.result(Output.write(data), 1000 seconds)
+
+  def clearDb() = Await.result(Output.delete, 1000 seconds)
 }

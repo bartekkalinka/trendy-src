@@ -24,17 +24,17 @@ class WordCountsTable(tag: Tag) extends Table[WordCount](tag, "wordcounts") {
 
 object Output {
   lazy val db = Database.forConfig("db")
+  val wcTable = TableQuery[WordCountsTable]
+  val deleteAction = sqlu"""DELETE FROM wordcounts"""
+  def insertAction(data: Seq[WordCount]) = wcTable ++= data
 
-  def write(data: Seq[WordCount]): Future[Unit] = {
-    val wcTable = TableQuery[WordCountsTable]
-    val deleteAction = sqlu"""DELETE FROM wordcounts"""
-    val insertAction = wcTable ++= data
-    db.run(
-      for {
-        _ <- deleteAction
-        _ <- insertAction
-      } yield ()
-    )
-  }
+  private def insert(data: Seq[WordCount]): Future[Unit] = db.run(insertAction(data).map(x => ()))
+
+  def delete: Future[Unit] = db.run(deleteAction).map(x => ())
+
+  def write(data: Seq[WordCount]): Future[Unit] = for {
+    _ <- delete
+    _ <- insert(data)
+  } yield ()
 }
 
