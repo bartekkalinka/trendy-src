@@ -30,6 +30,11 @@ object Db {
 
   def delete: Future[Unit] = db.run(deleteAction).map(x => ())
 
+  def minCommit: Future[Option[Commit]] =
+    db.run(sql"""SELECT seqnum, hash, commit_date FROM wordcounts WHERE seqnum = (SELECT MIN(seqnum) FROM wordcounts)"""
+      .as[(Int, String, DateTime)]
+    ).map(_.headOption).map(_.map(row => Commit(row._1, Hash(row._2), row._3)))
+
   def write(data: Seq[WordCount]): Future[Unit] = for {
     _ <- delete
     _ <- insert(data)

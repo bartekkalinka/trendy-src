@@ -1,7 +1,7 @@
 package pl.bka
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 import org.joda.time.DateTime
 
@@ -15,7 +15,7 @@ object Api {
     Counter(RealInput(path, ".scala")).read(take)
 
   def write(data: Seq[WordCount]) =
-    Await.result(Db.write(data), 1000 seconds)
+    Await.result(Db.write(data), Duration.Inf)
 
-  def clearDb() = Await.result(Db.delete, 1000 seconds)
+  def clearDb() = Await.result(Db.delete, Duration.Inf)
 }
