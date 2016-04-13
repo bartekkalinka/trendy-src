@@ -15,7 +15,7 @@ object Api {
     Counter(RealInput(path, ".scala")).read(take)
 
   def write(data: Seq[WordCount]) =
-    Await.result(Output.write(data), 1000 seconds)
+    Await.result(Db.write(data), 1000 seconds)
 
-  def clearDb() = Await.result(Output.delete, 1000 seconds)
+  def clearDb() = Await.result(Db.delete, 1000 seconds)
 }

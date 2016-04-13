@@ -1,7 +1,5 @@
 package pl.bka
 
-import java.time.LocalDateTime
-
 import org.joda.time.DateTime
 import slick.jdbc.JdbcBackend.Database
 import slick.driver.PostgresDriver.api._
@@ -22,7 +20,7 @@ class WordCountsTable(tag: Tag) extends Table[WordCount](tag, "wordcounts") {
   def * = (commit, word, count) <> ((WordCount.apply _).tupled, WordCount.unapply)
 }
 
-object Output {
+object Db {
   lazy val db = Database.forConfig("db")
   val wcTable = TableQuery[WordCountsTable]
   val deleteAction = sqlu"""DELETE FROM wordcounts"""
