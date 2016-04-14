@@ -36,7 +36,6 @@ object Db {
     ).map(_.headOption).map(_.map(row => Commit(row._1, Hash(row._2), row._3)))
 
   def write(data: Seq[WordCount]): Future[Unit] = for {
-    _ <- delete
     _ <- insert(data)
   } yield ()
 }
