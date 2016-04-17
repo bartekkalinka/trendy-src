@@ -25,7 +25,7 @@ object Api {
     Await.result(
       for {
         min <- Db.minCommit
-      } yield Counter(RealInput(path, extension)).read(min, take)
+      } yield Counter(RealInput(path, extension), min, take).read
     , Duration.Inf)
 
   def write(data: Seq[WordCount]) = Await.result(Db.write(data), Duration.Inf)
