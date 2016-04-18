@@ -16,3 +16,5 @@ libraryDependencies ++= {
     "com.github.tototoshi" %% "slick-joda-mapper" % "2.0.0"
   )
 }
+
+initialCommands in console := "import pl.bka.Api._; import pl.bka._"
