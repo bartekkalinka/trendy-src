@@ -13,8 +13,9 @@ libraryDependencies ++= {
     "com.typesafe" % "config" % "1.3.0",
     "joda-time" % "joda-time" % "2.9",
     "org.joda" % "joda-convert" % "1.8.1",
-    "com.github.tototoshi" %% "slick-joda-mapper" % "2.0.0"
+    "com.github.tototoshi" %% "slick-joda-mapper" % "2.0.0",
+    "org.jfree" % "jfreechart" % "1.0.19"
   )
 }
 
-initialCommands in console := "import pl.bka.Api._; import pl.bka._"
+initialCommands in console := "import pl.bka._"

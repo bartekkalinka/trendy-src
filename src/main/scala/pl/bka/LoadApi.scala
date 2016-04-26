@@ -11,7 +11,7 @@ case class Commit(seqNum: Int, hash: Hash, date: DateTime)
 case class Word(value: String)
 case class WordCount(commit: Commit, word: Word, count: Int)
 
-object Api {
+object LoadApi {
   private val extension = ".scala"
 
   def hasNext: Boolean =
