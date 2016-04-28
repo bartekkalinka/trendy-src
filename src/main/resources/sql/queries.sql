@@ -2,6 +2,10 @@
 
 select count(1) from wordcounts;
 
+select * from hashes order by seqnum;
+
+select count(1) from hashes;
+
 -- highest counts for single hashes
 select seqnum, hash, '.' || word || '.', count from wordcounts order by count desc, hash, word;
 
@@ -24,8 +28,6 @@ select seqnum, hash, commit_date, count(distinct word), sum(count) from wordcoun
 
 -- histogram of given word percentage in relation to total wordcount
 -- interesting words: map, Int, val, def, case, import, Array, tilePixels, state, player, Seq, akka, should, Option
-WITH word_hist AS (
-  select seqnum, hash, commit_date, sum(count) totalcount, sum(case when word = 'Seq' then count else 0 end) wordcount from wordcounts group by seqnum, hash, commit_date
-)
-select seqnum, hash, commit_date, wordcount * 100 / totalcount percent from word_hist order by seqnum;
-
+select h.seqnum, h.hash, h.commit_date, coalesce(w.count, 0) * 100 / h.totalcount percent 
+from hashes h left outer join (select * from wordcounts where word = 'Future') w on w.seqnum = h.seqnum 
+order by h.seqnum;
