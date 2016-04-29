@@ -24,8 +24,7 @@ object Db {
   lazy val db = Database.forConfig("db")
   val wcTable = TableQuery[WordCountsTable]
   val deleteAction = sqlu"""DELETE FROM wordcounts"""
-  def insertAction(data: Seq[WordCount]) = wcTable ++= data
-
+  private def insertAction(data: Seq[WordCount]) = wcTable ++= data
   private def insert(data: Seq[WordCount]): Future[Unit] = db.run(insertAction(data).map(x => ()))
 
   def delete: Future[Unit] = db.run(deleteAction).map(x => ())
@@ -38,5 +37,15 @@ object Db {
   def write(data: Seq[WordCount]): Future[Unit] = for {
     _ <- insert(data)
   } yield ()
+
+  def allWords: Future[Seq[Word]] =
+    db.run(sql"""SELECT word FROM words""".as[String]).map(_.map(Word))
+
+  def wordHistory(word: Word): Future[Seq[WordPercentage]] =
+    db.run(sql"""SELECT h.seqnum, h.hash, h.commit_date, COALESCE(w.count, 0) * 100 / h.totalcount percent
+                 FROM hashes h LEFT OUTER JOIN (SELECT * FROM wordcounts WHERE word = ${word.value}) w ON w.seqnum = h.seqnum
+                 ORDER BY h.seqnum""".as[(Int, String, DateTime, Double)]).map(_.map {
+      case (seqnum, hash, commitDate, percentage) => WordPercentage(Commit(seqnum, Hash(hash), commitDate), percentage)
+    })
 }
 
