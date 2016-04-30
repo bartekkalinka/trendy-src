@@ -16,12 +16,12 @@ object ReportApi {
   private def wordPercentageChart(word: Word, data: Seq[WordPercentage]): BufferedImage = {
     val lineChartDataset = new DefaultCategoryDataset()
     data.foreach { percentage =>
-      lineChartDataset.addValue(percentage.percentage, "words", percentage.commit.seqNum)
+      lineChartDataset.addValue(percentage.percentage, s"${word.value} percentage", percentage.commit.seqNum)
     }
 
     val lineChartObject = ChartFactory.createLineChart(
-      "Wordcounts in commits", "Commit",
-      "Wordcount",
+      word.value, "commits",
+      "percentage",
       lineChartDataset, PlotOrientation.VERTICAL,
       true, true, false)
 
