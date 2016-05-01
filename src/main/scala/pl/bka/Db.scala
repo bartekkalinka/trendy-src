@@ -39,7 +39,7 @@ object Db {
   } yield ()
 
   def allWords: Future[Seq[Word]] =
-    db.run(sql"""SELECT word FROM words""".as[String]).map(_.map(Word))
+    db.run(sql"""SELECT word FROM words ORDER BY totalcount DESC""".as[String]).map(_.map(Word))
 
   def wordHistory(word: Word): Future[Seq[WordPercentage]] =
     db.run(sql"""SELECT h.seqnum, h.hash, h.commit_date, COALESCE(w.count, 0) * 100 / h.totalcount percent

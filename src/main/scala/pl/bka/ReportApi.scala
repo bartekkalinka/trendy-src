@@ -28,10 +28,11 @@ object ReportApi {
     lineChartObject.createBufferedImage(1600, 1000)
   }
 
-  def chart(wordStr: String, outputDirectoryPath: String) = {
+  def chart(wordStr: String, outputDirectoryPath: String, prefix: String = "") = {
     val word = Word(wordStr)
+    val fileName = s"$prefix-${word.value}.png"
     def writeImage(img: BufferedImage) = {
-      val outputFile = new File(outputDirectoryPath, s"${word.value}.png")
+      val outputFile = new File(outputDirectoryPath, fileName)
       ImageIO.write(img, "png", outputFile)
     }
     Await.result(
@@ -41,6 +42,15 @@ object ReportApi {
         _ = writeImage(img)
       } yield (), Duration.Inf
     )
+    println(s"$fileName done")
   }
+
+  def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) =
+    Await.result(
+      for {
+        words <- Db.allWords
+        _ = words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, "%07d".format(i)) }
+      } yield (), Duration.Inf
+    )
 }
 

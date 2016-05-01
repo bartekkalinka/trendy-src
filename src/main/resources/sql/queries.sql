@@ -31,3 +31,5 @@ select seqnum, hash, commit_date, count(distinct word), sum(count) from wordcoun
 select h.seqnum, h.hash, h.commit_date, coalesce(w.count, 0) * 100 / h.totalcount percent 
 from hashes h left outer join (select * from wordcounts where word = 'Future') w on w.seqnum = h.seqnum 
 order by h.seqnum;
+
+select * from words order by totalcount desc;

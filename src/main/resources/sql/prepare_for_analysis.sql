@@ -10,6 +10,6 @@ CREATE INDEX wc_word_idx
   ON wordcounts (word);
 
 CREATE TABLE words AS
-SELECT distinct word FROM wordcounts;
+SELECT word, sum(count) totalcount FROM wordcounts GROUP BY word;
 
 
