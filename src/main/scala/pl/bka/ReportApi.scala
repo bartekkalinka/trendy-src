@@ -18,7 +18,7 @@ object ReportApi {
   private def wordPercentageChart(word: Word, data: Seq[WordPercentage]) = {
     val xySeries = new XYSeries("percentage")
     data.foreach { percentage =>
-      xySeries.add(percentage.commit.seqNum, percentage.percentage)
+      xySeries.add(percentage.commit.date.getMillis, percentage.percentage)
     }
     val xyDataSet = new XYSeriesCollection(xySeries)
 
@@ -27,6 +27,10 @@ object ReportApi {
       "percentage",
       xyDataSet, PlotOrientation.VERTICAL,
       true, true, false)
+
+    val plot = xyChart.getXYPlot
+    val axis = new DateAxis()
+    plot.setDomainAxis(axis)
 
     xyChart.createBufferedImage(1600, 1000)
   }
