@@ -4,8 +4,10 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import org.jfree.chart.ChartFactory
+import org.jfree.chart.axis.{DateAxis, SegmentedTimeline}
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.category.DefaultCategoryDataset
+import org.jfree.data.xy.{XYSeriesCollection, XYSeries}
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,19 +15,20 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class WordPercentage(commit: Commit, percentage: Double)
 
 object ReportApi {
-  private def wordPercentageChart(word: Word, data: Seq[WordPercentage]): BufferedImage = {
-    val lineChartDataset = new DefaultCategoryDataset()
+  private def wordPercentageChart(word: Word, data: Seq[WordPercentage]) = {
+    val xySeries = new XYSeries("percentage")
     data.foreach { percentage =>
-      lineChartDataset.addValue(percentage.percentage, s"${word.value} percentage", percentage.commit.seqNum)
+      xySeries.add(percentage.commit.seqNum, percentage.percentage)
     }
+    val xyDataSet = new XYSeriesCollection(xySeries)
 
-    val lineChartObject = ChartFactory.createLineChart(
+    val xyChart = ChartFactory.createXYLineChart(
       word.value, "commits",
       "percentage",
-      lineChartDataset, PlotOrientation.VERTICAL,
+      xyDataSet, PlotOrientation.VERTICAL,
       true, true, false)
 
-    lineChartObject.createBufferedImage(1600, 1000)
+    xyChart.createBufferedImage(1600, 1000)
   }
 
   def chart(wordStr: String, outputDirectoryPath: String, prefix: String = "") = {
