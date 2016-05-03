@@ -42,22 +42,15 @@ object ReportApi {
       val outputFile = new File(outputDirectoryPath, fileName)
       ImageIO.write(img, "png", outputFile)
     }
-    Await.result(
-      for {
-        data <- Db.wordHistory(word)
-        img = wordPercentageChart(word, data)
-        _ = writeImage(img)
-      } yield (), Duration.Inf
-    )
+    val data = Await.result(Db.wordHistory(word), Duration.Inf)
+    val img = wordPercentageChart(word, data)
+    writeImage(img)
     println(s"$fileName done")
   }
 
-  def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) =
-    Await.result(
-      for {
-        words <- Db.allWords
-        _ = words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, "%07d".format(i)) }
-      } yield (), Duration.Inf
-    )
+  def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) = {
+    val words = Await.result(Db.allWords, Duration.Inf)
+    words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, "%07d".format(i)) }
+  }
 }
 
