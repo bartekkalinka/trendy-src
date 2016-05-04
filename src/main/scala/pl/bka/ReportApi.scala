@@ -35,9 +35,10 @@ object ReportApi {
     xyChart.createBufferedImage(1600, 1000)
   }
 
-  def chart(wordStr: String, outputDirectoryPath: String, prefix: String = "") = {
+  def chart(wordStr: String, outputDirectoryPath: String, prefix: Option[Int] = None) = {
     val word = Word(wordStr)
-    val fileName = s"$prefix-${word.value}.png"
+    val fileNamePrefix = prefix.map(i => "%07d".format(i) + "-").getOrElse("")
+    val fileName = s"$fileNamePrefix${word.value}.png"
     def writeImage(img: BufferedImage) = {
       val outputFile = new File(outputDirectoryPath, fileName)
       ImageIO.write(img, "png", outputFile)
@@ -50,7 +51,7 @@ object ReportApi {
 
   def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) = {
     val words = Await.result(Db.allWords, Duration.Inf)
-    words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, "%07d".format(i)) }
+    words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, Some(i)) }
   }
 }
 
