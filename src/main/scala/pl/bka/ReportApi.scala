@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class WordPercentage(commit: Commit, percentage: Double)
 
 object ReportApi {
-  private def wordPercentageChart(word: Word, data: Seq[WordPercentage]) = {
+  private def drawChart(word: Word, data: Seq[WordPercentage]) = {
     val xySeries = new XYSeries("percentage")
     data.foreach { percentage =>
       xySeries.add(percentage.commit.date.getMillis, percentage.percentage)
@@ -37,16 +37,16 @@ object ReportApi {
 
   def chart(wordStr: String, outputDirectoryPath: String, prefix: Option[Int] = None) = {
     val word = Word(wordStr)
-    val fileNamePrefix = prefix.map(i => "%07d".format(i) + "-").getOrElse("")
-    val fileName = s"$fileNamePrefix${word.value}.png"
     def writeImage(img: BufferedImage) = {
+      val fileNamePrefix = prefix.map(i => "%07d".format(i) + "-").getOrElse("")
+      val fileName = s"$fileNamePrefix${word.value}.png"
       val outputFile = new File(outputDirectoryPath, fileName)
       ImageIO.write(img, "png", outputFile)
+      println(s"$fileName done")
     }
     val data = Await.result(Db.wordHistory(word), Duration.Inf)
-    val img = wordPercentageChart(word, data)
+    val img = drawChart(word, data)
     writeImage(img)
-    println(s"$fileName done")
   }
 
   def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) = {
