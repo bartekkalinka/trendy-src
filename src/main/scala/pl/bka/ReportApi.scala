@@ -35,7 +35,7 @@ object ReportApi {
     xyChart.createBufferedImage(1600, 1000)
   }
 
-  def chart(wordStr: String, outputDirectoryPath: String, prefix: Option[Int] = None) = {
+  def chart(wordStr: String, outputDirectoryPath: String, prefix: Option[Int] = None, dropCommits: Option[Int] = None) = {
     val word = Word(wordStr)
     def writeImage(img: BufferedImage) = {
       val fileNamePrefix = prefix.map(i => "%07d".format(i) + "-").getOrElse("")
@@ -44,14 +44,14 @@ object ReportApi {
       ImageIO.write(img, "png", outputFile)
       println(s"$fileName done")
     }
-    val data = Await.result(Db.wordHistory(word), Duration.Inf)
+    val data = Await.result(Db.wordHistory(word), Duration.Inf).drop(dropCommits.getOrElse(0))
     val img = drawChart(word, data)
     writeImage(img)
   }
 
-  def charts(outputDirectoryPath: String, take: Option[Int] = Some(100)) = {
+  def charts(outputDirectoryPath: String, takeWords: Option[Int] = Some(100), dropCommits: Option[Int] = None) = {
     val words = Await.result(Db.allWords, Duration.Inf)
-    words.take(take.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, Some(i)) }
+    words.take(takeWords.getOrElse(words.length)).zipWithIndex.foreach { case (word, i) => chart(word.value, outputDirectoryPath, Some(i), dropCommits) }
   }
 }
 
