@@ -5,7 +5,7 @@ Initial code by [profes](https://github.com/profes) as an exercise solution for 
 
 # Usage
 
-First, you need a clean Postgresql database.  Copy src/main/resources/application.conf.template to application.conf in the same directory, and fill it with connection/login information (ip address, database name, user and password).
+First, you need a clean Postgresql database.  Copy `src/main/resources/application.conf.template` to `application.conf` in the same directory, and fill it with connection/login information (ip address, database name, user and password).
 
 Run `create table wordcounts` statement from `src/main/resources/sql/create_table.sql` script on the database.
 
