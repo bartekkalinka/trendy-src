@@ -33,3 +33,6 @@ Generate charts for 100 top words
     
 Enjoy viewing the charts!
 
+![Chart 1](./example/0000000-import.png)
+![Chart 2](./example/0000001-def.png)
+![Chart 3](./example/0000003-val.png)
