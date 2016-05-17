@@ -29,7 +29,7 @@ Start sbt console again
     
 Generate charts for 100 top words
 
-    ReportApi.charts("./caves_charts")
+    scala> ReportApi.charts("./caves_charts")
     
 Enjoy viewing the charts!
 
